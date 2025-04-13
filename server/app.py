@@ -32,11 +32,59 @@ def create_app():
     from server.models import Guest, Episode, Appearance
 
 
-    #Route for homepage
+    #Homepage
     @app.route("/")
     def index():
         return "<h1>Code challenge</h1>"
     
+
+    #GET /episodes
+    @app.route('/episodes', methods = ['GET'])
+    def get_episodes():
+        episodes = Episode.query.all()
+        return jsonify([episode.to_dict()for episode in episodes]), 200
+    
+    #GET /episodes/:id
+    @app.route('/episodes/<int:id>', methods = ['GET'])
+    def get_episode(id):
+        episode = Episode.query.get(id)
+        if not episode:
+            return jsonify({'error': "Episode not found"}),404
+        return jsonify(episode.to_dict(rules=('-appearances.episode',))),200
+    
+    #GET /guests
+    @app.route('/guests', methods =['GET'])
+    def get_guests():
+        guests = Guest.query.all()
+        return jsonify([guest.to_dict(only=("id", "name", "occupation"))for guest in guests]), 200
+    
+
+    #POST /appearances
+    @app.route('/appearances', methods = ['POST'])
+    def make_appearance():
+        data = request.get_json()
+
+        try:
+            appearance = Appearance(
+               rating = data['rating'],
+               guest_id = data['guest_id'],
+               episode_id = data['episode_id']
+
+            )
+            db.session.add(appearance)
+            db.session.commit()
+
+            return jsonify(appearance.to_dict()), 201
+        
+        except ValueError:
+            db.session.rollback()
+            return jsonify ({"errors": ["validation errors"]}), 400
+        
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error" : str(e)}), 400
+        
+        
     return app
 
 
