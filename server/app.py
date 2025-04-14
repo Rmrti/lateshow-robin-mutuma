@@ -44,13 +44,24 @@ def create_app():
         episodes = Episode.query.all()
         return jsonify([episode.to_dict()for episode in episodes]), 200
     
-    #GET /episodes/:id
+    #GET /episodes/<int:id>
     @app.route('/episodes/<int:id>', methods = ['GET'])
     def get_episode(id):
         episode = Episode.query.get(id)
         if not episode:
             return jsonify({'error': "Episode not found"}),404
         return jsonify(episode.to_dict(rules=('-appearances.episode',))),200
+    
+    #DELETE /episodes/<int:id>
+    @app.route('/episodes/<int:id>', methods = ['DELETE'])
+    def delete_episode(id):
+        episode = Episode.query.get(id)
+        if not episode:
+            return jsonify ({'error':'Episode not found'}),404
+        
+        db.session.delete(episode)
+        db.session.commit()
+        return '',204
     
     #GET /guests
     @app.route('/guests', methods =['GET'])
