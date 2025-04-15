@@ -15,7 +15,7 @@ class Guest(db.Model, SerializerMixin):
 
     # add relationship
 
-    appearances = db.relationship ('Appeareance' , backref = 'guest', cascade = "all, delete")
+    appearances = db.relationship ('Appearance' , backref = 'guest', cascade = "all, delete")
     
 
 

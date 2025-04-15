@@ -36,7 +36,7 @@ source venv/bin/activate (used venv since my laptop had issues with pipenv)
 ### 3. Run database migrations
 
 ```bash
-fl upgrade head
+flask upgrade head
 ```
 
 ### 4. Start the server
